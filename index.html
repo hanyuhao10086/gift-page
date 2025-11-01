@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>万圣节礼物</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: linear-gradient(135deg, #2c2c2c 0%, #4a4a4a 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      font-family: "微软雅黑", sans-serif;
+      color: #fff;
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+    .title {
+      font-size: 3rem;
+      margin-bottom: 20px;
+      color: #ff7f2a;
+      text-shadow: 0 0 10px rgba(255, 127, 42, 0.5);
+      text-align: center;
+      z-index: 2;
+    }
+    .guide {
+      font-size: 1.2rem;
+      margin-bottom: 40px;
+      text-align: center;
+      max-width: 500px;
+      line-height: 1.6;
+      z-index: 2;
+    }
+    .gift-btn {
+      padding: 15px 40px;
+      background-color: #ff6b00;
+      color: white;
+      border: none;
+      border-radius: 30px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 5px 15px rgba(255, 107, 0, 0.3);
+      z-index: 2;
+    }
+    .gift-btn:hover {
+      background-color: #ff5200;
+      transform: scale(1.05);
+      box-shadow: 0 8px 20px rgba(255, 107, 0, 0.5);
+    }
+    .pumpkin { font-size: 2.5rem; margin: 0 10px; }
+    .card-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+    .tip-card {
+      position: absolute;
+      padding: 12px 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      font-size: 1rem;
+      max-width: 200px;
+      opacity: 0; /* 初始透明 */
+      animation: fadeIn 0.5s forwards, stayFloat 6s ease-in-out infinite;
+    }
+    /* 卡片渐入动画 */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.8); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    /* 静态悬浮动画 */
+    @keyframes stayFloat {
+      0% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-8px) rotate(1deg); }
+      100% { transform: translateY(0) rotate(0deg); }
+    }
+    .card-pink { background-color: rgba(255, 200, 210, 0.9); color: #333; }
+    .card-yellow { background-color: rgba(255, 240, 200, 0.9); color: #333; }
+    .card-blue { background-color: rgba(200, 230, 255, 0.9); color: #333; }
+    .card-purple { background-color: rgba(230, 200, 255, 0.9); color: #333; }
+    .card-green { background-color: rgba(200, 255, 220, 0.9); color: #333; }
+    .tip-card::before {
+      content: "❤️ 祝福";
+      margin-right: 8px;
+      font-size: 0.9rem;
+      color: #e63946;
+    }
+    @media (max-width: 768px) {
+      .title { font-size: 2.2rem; }
+      .guide { font-size: 1rem; }
+      .gift-btn { padding: 12px 30px; font-size: 1rem; }
+      .tip-card { max-width: 150px; font-size: 0.9rem; }
+    }
+  </style>
+</head>
+<body>
+  <h1 class="title">
+    <span class="pumpkin">🎃</span>万圣节礼物<span class="pumpkin">🎃</span>
+  </h1>
+  <p class="guide">您有一份万圣节专属礼物，确定要打开吗？</p>
+  <button class="gift-btn" id="openBtn">打开礼物</button>
+  <div class="card-container" id="cardContainer"></div>
+
+  <script>
+    // 200条简短女生祝福（每条前添加“妍妍，”）
+    const tipTexts = [
+      "妍妍，今天的你，比星光还亮", "妍妍，笑一笑，好运会追上你", "妍妍，温柔的人，值得被温柔待",
+      "妍妍，小日子，慢慢发光呀", "妍妍，你低头时，风都变甜了", "妍妍，今天也有在好好生活呀",
+      "妍妍，累了就歇，你超棒的", "妍妍，眼里的光，别让它暗了", "妍妍，每一天，都值得被期待",
+      "妍妍，你的可爱，治愈一切呀", "妍妍，阳光正好，适合开心", "妍妍，做自己，就是最好的样子",
+      "妍妍，别慌，好运在排队呢", "妍妍，你值得所有温柔事物", "妍妍，今天的云，像你的笑容",
+      "妍妍，慢慢走，风景在等你", "妍妍，你在，日子就有甜味", "妍妍，偶尔偷懒，也没关系呀",
+      "妍妍，你的努力，有人悄悄看", "妍妍，风里有花香，像你一样", "妍妍，今天也要记得微笑呀",
+      "妍妍，你比你想的更强大", "妍妍，小确幸，藏在细节里呢", "妍妍，别否定自己，你超棒的",
+      "妍妍，今天的你，闪闪发光", "妍妍，好好吃饭，好好爱自己", "妍妍，你的存在，本身就美好",
+      "妍妍，累了就抱抱自己呀", "妍妍，抬头看看，月亮在等你", "妍妍，简单的日子，也有浪漫",
+      "妍妍，你笑起来，世界都亮了", "妍妍，慢慢来，时光很温柔", "妍妍，今天的你，也在进步呀",
+      "妍妍，别焦虑，一切都会好的", "妍妍，你的善良，会有回响的", "妍妍，喝杯热饮，暖暖今天吧",
+      "妍妍，你值得被捧在手心呀", "妍妍，小烦恼，会被风吹走的", "妍妍，今天的你，也很可爱呀",
+      "妍妍，做喜欢的事，别犹豫呀", "妍妍，阳光落在你身上，真好", "妍妍，你的坚持，会开花的",
+      "妍妍，别委屈自己，要开心呀", "妍妍，今天的风，在说喜欢你", "妍妍，你比星光，更让人动心",
+      "妍妍，简单点，快乐就多一点", "妍妍，你的温柔，是宝藏呀", "妍妍，累了就停，不赶路也可",
+      "妍妍，今天的你，值得被奖励", "妍妍，小美好，正在发生呢", "妍妍，你一笑，烦恼都逃跑了",
+      "妍妍，别着急，好运在路上了", "妍妍，你的努力，从不会白费", "妍妍，今天的云，为你停留了",
+      "妍妍，做自己的光，就够了呀", "妍妍，偶尔任性，也很可爱呢", "妍妍，你的存在，就是礼物呀",
+      "妍妍，好好休息，明天更有力", "妍妍，风里有甜，像你的名字", "妍妍，今天的你，比昨天更好",
+      "妍妍，别慌，你有慢慢来的权利", "妍妍，你的可爱，超标了哦", "妍妍，小日子，慢慢变甜吧",
+      "妍妍，累了就靠靠，不硬撑呀", "妍妍，今天的阳光，为你而来", "妍妍，你值得，所有的美好呀",
+      "妍妍，别否定，你超厉害的", "妍妍，微笑一下，心情会发芽", "妍妍，今天的你，也在发光呀",
+      "妍妍，简单的幸福，最踏实啦", "妍妍，你的善良，自带光芒呀", "妍妍，喝口水，继续可爱下去",
+      "妍妍，别着急，好戏在后头呢", "妍妍，你笑起来，空气都甜了", "妍妍，慢慢来，时间会给答案",
+      "妍妍，今天的你，也很努力呀", "妍妍，小烦恼，别放在心上呀", "妍妍，你的温柔，治愈了时光",
+      "妍妍，累了就睡，好梦在等你", "妍妍，今天的风，吹走坏心情", "妍妍，你比星光，更温柔呀",
+      "妍妍，简单生活，也有小浪漫", "妍妍，你的坚持，会被看见的", "妍妍，别委屈，你值得被疼呀",
+      "妍妍，抬头看看，星星在眨眼", "妍妍，今天的你，也很优秀呀", "妍妍，小确幸，藏在早餐里呢",
+      "妍妍，你的可爱，无人能及呀", "妍妍，累了就歇，不拼也可以", "妍妍，阳光正好，适合喜欢你",
+      "妍妍，你值得，被全世界偏爱", "妍妍，别焦虑，一切都来得及", "妍妍，你的善良，会有回报的",
+      "妍妍，喝杯奶茶，甜一下今天", "妍妍，今天的雨，都在为你温柔", "妍妍，你一低头，温柔满溢啦",
+      "妍妍，小脚步，也能走很远呢", "妍妍，你的努力，藏在细节里", "妍妍，别慌，我在为你加油呀",
+      "妍妍，笑一笑，今天会更甜哦", "妍妍，你的存在，让世界温柔", "妍妍，累了就躺，天不会塌的",
+      "妍妍，今天的花，开得像你一样", "妍妍，你值得，所有温柔以待", "妍妍，别否定，你超棒的呀",
+      "妍妍，微笑是最好的化妆品呢", "妍妍，今天的你，也在发光呀", "妍妍，简单的快乐，最难得啦",
+      "妍妍，你的善良，会被记住的", "妍妍，喝杯咖啡，提提神呀", "妍妍，别着急，美好在等你呢",
+      "妍妍，你笑起来，像颗小太阳", "妍妍，慢慢来，幸福会追上你", "妍妍，今天的你，也很了不起",
+      "妍妍，小烦恼，都是暂时的呀", "妍妍，你的温柔，是人间宝藏", "妍妍，累了就歇，明天再努力",
+      "妍妍，今天的风，带着好运呢", "妍妍，你比星光，更耀眼呀", "妍妍，平凡日子，也有小确幸",
+      "妍妍，你的坚持，终将美好呀", "妍妍，别委屈，有人疼你呢", "妍妍，抬头看看，月亮在笑呢",
+      "妍妍，今天的你，也很优秀呀", "妍妍，日子再忙，也要偷个懒呀", "妍妍，你的眼睛里，有小星星",
+      "妍妍，偶尔脆弱，也没关系的", "妍妍，今天的阳光，甜度刚好", "妍妍，你值得，所有的偏爱呀",
+      "妍妍，别慌，一步一步来就好", "妍妍，笑起来的你，最动人啦", "妍妍，小日子，慢慢熬成甜呀",
+      "妍妍，你的努力，不会被辜负的", "妍妍，累了就抱抱，自己也可以", "妍妍，今天的云，形状很可爱",
+      "妍妍，做自己喜欢的样子就好", "妍妍，你的可爱，藏不住啦", "妍妍，简单点，快乐就会多一点",
+      "妍妍，你的温柔，像春天的风", "妍妍，别着急，美好会如约而至", "妍妍，今天的你，也在成长呀",
+      "妍妍，小烦恼，睡一觉就忘了", "妍妍，你值得，被认真对待呀", "妍妍，抬头看看，天空很蓝呢",
+      "妍妍，你的存在，就是小确幸呀", "妍妍，累了就停，不勉强自己", "妍妍，今天的花，香得刚刚好",
+      "妍妍，你比你想象中更勇敢", "妍妍，别否定，你真的很棒呀", "妍妍，微笑一下，运气不会差",
+      "妍妍，今天的你，也在发光呀", "妍妍，平凡的日子，也有闪光点", "妍妍，你的善良，是种超能力",
+      "妍妍，喝杯温水，暖暖身子呀", "妍妍，别着急，好事会发生的", "妍妍，你笑起来，像棉花糖一样",
+      "妍妍，慢慢来，时光会偏爱你", "妍妍，今天的你，也很用心呀", "妍妍，小烦恼，别让它影响你",
+      "妍妍，你的温柔，能治愈一切", "妍妍，累了就休息，不硬撑呀", "妍妍，今天的风，很舒服呢",
+      "妍妍，你比星光，更让人欢喜", "妍妍，简单生活，也有大幸福", "妍妍，你的坚持，会有结果的",
+      "妍妍，别委屈，你值得被爱呀", "妍妍，抬头看看，星星在守护你", "妍妍，今天的你，也很出色呀",
+      "妍妍，小确幸，藏在下午茶里", "妍妍，你的可爱，是限量版哦", "妍妍，累了就歇，明天再出发",
+      "妍妍，阳光正好，适合想念你", "妍妍，你值得，全世界的温柔", "妍妍，别焦虑，一切都会如愿",
+      "妍妍，你的善良，会循环回来的", "妍妍，喝杯果汁，清爽一下吧", "妍妍，今天的你，比糖还甜"
+    ];
+
+    const cardColors = ["card-pink", "card-yellow", "card-blue", "card-purple", "card-green"];
+    const cardCount = 200; // 总生成200张卡片
+    const interval = 300; // 每张卡片间隔300毫秒出现
+
+    document.getElementById('openBtn').addEventListener('click', function() {
+      const container = document.getElementById('cardContainer');
+      container.innerHTML = ''; // 清空旧卡片
+      
+      // 逐条生成200张卡片
+      for (let i = 0; i < cardCount; i++) {
+        setTimeout(() => {
+          createTipCard(container);
+        }, i * interval);
+      }
+    });
+
+    function createTipCard(container) {
+      const card = document.createElement('div');
+      card.className = `tip-card ${cardColors[Math.floor(Math.random() * cardColors.length)]}`;
+      card.textContent = tipTexts[Math.floor(Math.random() * tipTexts.length)];
+      
+      // 随机位置（避免边缘）
+      const left = Math.random() * 80 + 10;
+      const top = Math.random() * 80 + 10;
+      card.style.left = `${left}%`;
+      card.style.top = `${top}%`;
+      
+      container.appendChild(card);
+    }
+  </script>
+</body>
+</html>
